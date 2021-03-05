@@ -1,0 +1,153 @@
+<html>
+<head>
+<style>
+html, body {
+  width:  100%;
+  height: 100%;
+  margin: 0px;
+  overflow:hidden;
+  display:block;
+  background-color:black
+}
+</style>
+</head>
+<body onload=toggle() onkeypress=keyboom(event) ondblclick=clickboom(event,3,1) onmousemove=trail(event,held)>
+<canvas id="canvas" width="1600" height="900"></canvas>
+<p id = "log" style="position:absolute; top:5px; left:15px; background-color:#111509; width:150px; text-align:center; color:white; border-radius:5px;"></p>
+
+<script>
+var ctx = document.getElementById("canvas").getContext("2d");
+ctx.canvas.width  = window.innerWidth;
+ctx.canvas.height = window.innerHeight;
+var dotSize = 1;
+var colors = ['blue','red','orange','green', 'gold','silver','purple','black', 'cyan']
+var limit =30
+var colMax = 256
+var held =false
+
+document.addEventListener("mousedown", mouselen, false);
+document.addEventListener("mouseup", mousecalc, false);
+
+function get_random_color() {
+  function c() {
+    var hex = Math.floor(Math.random()*colMax).toString(16);
+    return ("0"+String(hex)).substr(-2); // pad with zero
+  }
+  return "#"+c()+c()+c();
+}
+
+function makedot(){
+	var x = Math.floor(Math.random()*window.innerWidth+dotSize)-(dotSize/2)
+	var y  = Math.floor(Math.random()*window.innerHeight+dotSize)-(dotSize/2)
+	var c = get_random_color()
+	count+=1
+	return {x:x,y:y,c:c}
+}
+function drawdot(dot){
+	ctx.fillStyle = dot.c;
+    ctx.beginPath(); 
+    ctx.arc(dot.x, dot.y, dotSize, 0, Math.PI * 2, true); 
+    ctx.fill()
+	count+=1
+}
+
+var count = 0
+var total = 0
+var dots = []
+var bool = null
+var clickstart;
+var clickend;
+
+function toggle(){
+	if (bool===null){
+		bool = window.setInterval(function go(){
+			while(count<limit){
+				dots[count] = makedot()
+			}
+			count =0
+			total +=1
+			while(count<limit){
+				drawdot(dots[count])
+			}
+			count =0
+			document.getElementById('log').innerHTML= "Dots: "+(total * limit) 
+		},1)
+	}
+	else{
+		window.clearInterval(bool)
+		bool = null
+	}
+}
+ 
+ function mouselen(e){
+	held=true
+	clickstart = new Date()
+ }
+ function mousecalc(e){
+	held=false
+	clickend = new Date()
+	var timer = Math.ceil((clickend - clickstart) /500.0)
+	clickboom(e, timer,0)
+ }
+ function trail(e,h){
+	if(h){
+		clickboom(e, 0,0)
+	}
+}
+function clickboom(el, t,s){
+	t=t+1
+	if(t>7){t=7;}
+	var r = Math.floor(Math.random()*15)+10
+	var r2 = Math.floor(Math.random()*8)+5
+	boom(el.clientX,el.clientY, t*r, t*r2,s)
+}
+
+function keyboom(e){
+	if(e.key === ' '){
+		toggle()
+	}
+	else{
+		var scale = Number(e.key)
+		var rx = Math.floor(Math.random()*window.innerWidth-100)+50
+		var ry  = Math.floor(Math.random()*window.innerHeight-100)+50
+		if (isNaN(scale) || e.key === null || e.key === ' '){
+			boom(rx,ry,-1,-1,0) 
+		}
+		else{
+			if (scale ==0) {scale=10}
+			boom(rx,ry,(scale*20),-1,0)
+		}
+	}
+}
+
+function boom(x,y,siz, t, special){
+	if(siz==-1){
+		siz = Math.floor(Math.random()*100)+20
+	}
+	if(t==-1){
+		var counter = Math.floor(Math.random()*20)+10
+	}
+	else{
+		var counter = t
+	}
+	var incr = siz/10
+	var inter = window.setInterval(function goop(){
+		if(counter > 0){
+			if (special==0){ctx.fillStyle = 'black';}
+			else{ctx.fillStyle = get_random_color();}
+			ctx.beginPath(); 
+			ctx.arc(x, y, siz, 0, Math.PI * 2, true); 
+			ctx.fill()
+			counter-=1
+			siz+= incr
+			if(counter<=2){special=0}
+		}
+		else{
+			window.clearInterval(inter)
+		}
+	},40)
+}
+</script>
+</body>
+
+</html>

@@ -1,0 +1,181 @@
+<!doctype html>
+<html>
+<head>
+<title>Happy Birthday to Jess</title>
+<style>
+html, body {
+  width:  100%;
+  height: 100%;
+  margin: 0px;
+  overflow:hidden;
+  display:block;
+  background-color:black
+}
+</style>
+</head>
+<body onload=toggle() onkeypress=keyboom(event) ondblclick=clickboom(event,3,1) onmousemove=trail(event)>
+<canvas id="canvas" width="1600" height="900"></canvas>
+
+<script>
+var ctx = document.getElementById("canvas").getContext("2d");
+ctx.canvas.width  = window.innerWidth;
+ctx.canvas.height = window.innerHeight;
+var dotSize = 2;
+var limit =200
+
+var rMax = 160
+var rMin = 100
+var gMax = 256
+var gMin = 156
+var bMax = 50
+var bMin = 20
+
+document.addEventListener("mousedown", droptext, false);
+
+function get_random_color() {
+  function c(cl) {
+	if(cl=='r'){var hex = Math.floor(Math.random()*rMax)+rMin;}
+	else if (cl =='g'){var hex =Math.floor(Math.random()*gMax)+gMin;}
+	else if (cl =='b'){var hex = Math.floor(Math.random()*bMax)+bMin;}
+    return ("0"+String(hex.toString(16))).substr(-2); // pad with zero
+  }
+  return "#"+c('r')+c('g')+c('b');
+}
+
+function makedot(){
+	var x = Math.floor(Math.random()*window.innerWidth+dotSize)-(dotSize/2)
+	var y  = Math.floor(Math.random()*window.innerHeight+dotSize)-(dotSize/2)
+	var c = get_random_color()
+	count+=1
+	return {x:x,y:y,c:c}
+}
+function drawdot(dot){
+	ctx.fillStyle = dot.c;
+    ctx.beginPath(); 
+    ctx.arc(dot.x, dot.y, dotSize, 0, Math.PI * 2, true); 
+    ctx.fill()
+	count+=1
+}
+
+var count = 0
+var total = 0
+var dots = []
+var bool = null
+
+function toggle(){
+	if (bool===null){
+		bool = window.setInterval(function go(){
+			while(count<limit){
+				dots[count] = makedot()
+			}
+			count =0
+			while(count<limit){
+				drawdot(dots[count])
+			}
+			count =0
+		},1)
+	}
+	else{
+		window.clearInterval(bool)
+		bool = null
+	}
+}
+var m = Math.floor(Math.random()*5)
+
+ var messages = ["Happy Birthday","Merry Birthmas","It's Jess-erday","Feliz Cumpleaños", "Another Year Wiser"]
+ 
+ function droptext(e){
+	 var cont = 16
+	 var tex = 75
+	 var box = 900
+	 var xoff = -450
+	 var boy = 140
+	 var yoff=-100
+	 var cr = 300
+	 var x = window.innerWidth/2
+	 var y = window.innerHeight/2
+	 ctx.textAlign='center'
+	 var inter2 = window.setInterval(function goop(){
+		if(cont > 0){
+			ctx.font = tex+"px Arial"
+			ctx.fillStyle = '#3300FF'
+			ctx.beginPath(); 
+			ctx.arc(x, y+35, cr, 0, Math.PI, true); 
+			ctx.fill()
+			ctx.fillStyle = '#380474'
+			ctx.fillRect(x+xoff, y+yoff, box, boy)
+			ctx.fillStyle = "white"
+			ctx.fillText(messages[m], x, y); 
+			cont-=1
+			tex +=2
+			box +=8
+			xoff -= 4
+			cr+=2
+		}
+		else{
+			window.clearInterval(inter2)
+		}
+	},30)
+	m = (m+1) %5
+ }
+
+ function trail(e){
+		clickboom(e, 0,0)
+}
+function clickboom(el, t,s){
+	t=t+1
+	if(t>7){t=7;}
+	var r = Math.floor(Math.random()*15)+10
+	var r2 = Math.floor(Math.random()*8)+5
+	boom(el.clientX,el.clientY, t*r, t*r2,s)
+}
+
+function keyboom(e){
+	if(e.key === ' '){
+		toggle()
+	}
+	else{
+		var scale = Number(e.key)
+		var rx = Math.floor(Math.random()*window.innerWidth-100)+50
+		var ry  = Math.floor(Math.random()*window.innerHeight-100)+50
+		if (isNaN(scale) || e.key === null || e.key === ' '){
+			boom(rx,ry,-1,-1,0) 
+		}
+		else{
+			if (scale ==0) {scale=10}
+			boom(rx,ry,(scale*20),-1,0)
+		}
+	}
+}
+
+function boom(x,y,siz, t, special){
+	if(siz==-1){
+		siz = Math.floor(Math.random()*100)+20
+	}
+	if(t==-1){
+		var counter = Math.floor(Math.random()*20)+10
+	}
+	else{
+		var counter = t
+	}
+	var incr = siz/10
+	var inter = window.setInterval(function goop(){
+		if(counter > 0){
+			if (special==0){ctx.fillStyle = 'black';}
+			else{ctx.fillStyle = get_random_color();}
+			ctx.beginPath(); 
+			ctx.arc(x, y, siz, 0, Math.PI * 2, true); 
+			ctx.fill()
+			counter-=1
+			siz+= incr
+			if(counter<=2){special=0}
+		}
+		else{
+			window.clearInterval(inter)
+		}
+	},40)
+}
+</script>
+</body>
+
+</html>
