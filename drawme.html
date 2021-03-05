@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head><title> pictionary </title>
+<style>
+body{overflow: hidden}
+div{font-size:32px;}
+#colorpicker{float:left;}
+#penselect{float:left;}
+#wordbar{float:right;}
+#art{position:absolute; top:50px;width:99%;height:95%;background-color:grey;margin:auto}
+</style>
+</head>
+<body id='bod'>
+
+<div id='colorpicker'>COLORS</div>
+<div id='penselect'><select name='pen' size='5'>
+  <option value="straight">ruler</option>
+  <option value="pencil">pencil</option>
+  <option value="ink">ink</option></select></div>
+<div id ='wordbar'>Random Word Here</div>
+<div id= 'art' onmousemove=bloom(event,0,0,held) onmousedown=mdown(event) onmouseup=msup(event) onmouseout=msup(event)>fill me with canvas</div>
+<script>
+var held = false
+var fullwid = window.innerWidth * 0.99
+var panelheight = window.innerHeight *.95
+document.getElementById("bod").addEventListener("click", function(event){
+  event.preventDefault()
+});
+document.getElementById('art').innerHTML = "<canvas id='cv' width = "+fullwid+"px height= "+panelheight+"px>"
+var ctx = document.getElementById("cv").getContext("2d");
+document.getElementById('cv').ondragstart = function () { return false; };
+
+function mdown(ev){
+	held = true;
+}
+function msup(ev){
+	held=false;
+}
+function bloom(el, t, s, h){
+	if (h){
+		t=t+1
+		if(t>7){t=7;}
+		var r = Math.floor(Math.random()*5)+2
+		var r2 = Math.floor(Math.random()*5)+3
+		boom(el.clientX-5,el.clientY-(0.05*window.innerHeight), t*r, t*r2,s)
+	}
+}
+
+function boom(x,y,siz, t, special){
+	if(siz==-1){
+		siz = Math.floor(Math.random()*100)+20
+	}
+	if(t==-1){
+		var counter = Math.floor(Math.random()*20)+10
+	}
+	else{
+		var counter = t
+	}
+	var incr = siz/10
+	var inter = window.setInterval(function goop(){
+		if(counter > 0){
+			if (special==0){ctx.fillStyle = 'black';}
+			else{ctx.fillStyle = get_random_color();}
+			ctx.beginPath(); 
+			ctx.arc(x, y, siz, 0, Math.PI * 2, true); 
+			ctx.fill()
+			counter-=1
+			siz+= incr
+			if(counter<=2){special=0}
+		}
+		else{
+			window.clearInterval(inter)
+		}
+	},40)
+}
+</script>
+</body>
+</html>
